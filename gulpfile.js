@@ -1,0 +1,89 @@
+"use strict";
+// Include gulp
+var fs = require("fs");
+var gulp = require("gulp");
+var sourcemaps = require("gulp-sourcemaps")
+var path = require("path");
+var browserSync = require("browser-sync").create();
+var sass = require('gulp-sass');
+var babelify = require('babelify');
+var gutil = require('gulp-util');
+var replace = require('gulp-replace');
+
+var browserify = require("browserify");
+var source = require('vinyl-source-stream');
+var reload = browserSync.reload;
+
+var runSequence = require('run-sequence');
+
+
+var extensions = ['.js','.json','.es6'];
+
+gulp.task('watch',['browserify', 'sass'], function(){
+  browserSync.init({
+     server:'./src'
+  });
+  gulp.watch("./src/sass/**/*.scss", ['sass']);
+  gulp.watch("./src/scripts/**/*.js", ['browserify']);
+  gulp.watch("./src/**/*.html").on('change', reload);
+  gulp.watch("./src/bundle.js").on('change', reload);
+});
+
+gulp.task('sass',function(){
+  return gulp.src('./src/sass/**/*.scss')
+  .pipe(sourcemaps.init())
+  .pipe(sass()).on('error', function logError(error) {
+      console.error(error);
+  })
+  .pipe(sourcemaps.write())
+  .pipe(gulp.dest('./src/css'))
+  .pipe(reload({stream:true}));
+});
+
+gulp.task('browserify',function(){
+  return browserify({entries: './src/scripts/app.js', debug:true, extensions: extensions})
+    .transform(babelify)
+    .on('error', gutil.log)
+    .bundle()
+    .on('error', gutil.log)
+    .pipe(source('bundle.js'))
+    .pipe(gulp.dest('./src'));
+});
+
+
+gulp.task("copy", function () {
+   return gulp.src([
+        "src/*.html",
+        "src/*.js",
+        "src/*.json",
+        "src/css/**",
+        "src/assets/**",
+        ],{"base":"./src"})
+    .pipe(gulp.dest('./public/'));
+});
+
+gulp.task("replace", function(){
+  gulp.src(['./public/bundle.js'])
+  .pipe(replace('/* SERVICE_WORKER_REPLACE', ''))
+  .pipe(replace('SERVICE_WORKER_REPLACE */', ''))
+  .pipe(gulp.dest('./public/'));
+});
+
+gulp.task("replace_timestamp", function(){
+  gulp.src(['./public/service-worker.js'])
+  .pipe(replace('{timestamp}', Date.now()))
+  .pipe(gulp.dest('./public/'));
+})
+
+
+gulp.task('build',function(){
+  runSequence(
+    ['browserify', 'sass'],
+    'copy',
+    'replace',
+    'replace_timestamp'
+  );
+});
+
+/* Default task */
+gulp.task("default", ["watch"]);

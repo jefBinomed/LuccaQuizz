@@ -35,3 +35,16 @@ jspm_packages
 
 # Optional REPL history
 .node_repl_history
+
+# Google App Engine generated folder
+appengine-generated/
+
+dist/
+src/css/
+src/assets/audio/
+src/assets/video/
+node_modules/
+public/
+
+.firebaserc
+bundle*
