@@ -1,5 +1,5 @@
 'use strict'
-import {FireBaseLegoApp} from './firebase/firebase.js';
+import {FireBaseQuizzApp} from './firebase/firebase.js';
 import {FireBaseAuth} from './firebase/firebaseAuth.js';
 
 
