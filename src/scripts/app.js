@@ -18,7 +18,7 @@ import {QuestionService} from './questions/questionService.js';
 
 	function pageLoad() {
 
-		fireBaseLego = new FireBaseQuizzApp().app;
+		fireBaseQuizz = new FireBaseQuizzApp().app;
 		// We init the authentication object
 		let fireBaseAuth = new FireBaseAuth({
 			idDivLogin: 'login-msg',
@@ -28,29 +28,34 @@ import {QuestionService} from './questions/questionService.js';
 			idDisplayName: "name-user"
 		});
 
+		fireBaseAuth.onAuthStateChanged((user)=>{
+			if (user){
+				fireBaseQuizz.database().ref("/admins").once('value', (snapshot)=>{
+					isAdmin = true;
+					document.getElementById('menu-admin').removeAttribute('hidden');
+				}, (err)=>{
+					console.error('not authorized !');
+				});
+			}
+		});
+
 		new QuestionService();
 
 		/**
 		 * Management of Cinematic Buttons
 		 */
 		const startBtn = document.getElementById('startBtn');
-		const helpBtn = document.getElementById('help')
 
 		const streamStart = Rx.Observable
 			.fromEvent(startBtn, 'click')
 			.map(() => 'start');
 
-		const streamHelp = Rx.Observable
-			.fromEvent(helpBtn, 'click')
-			.map(() => 'help');
 
-		streamStart.merge(streamHelp)
+		streamStart
 			.subscribe((state) => {
 				if (state === 'start') {
 					document.getElementById('hello-msg').setAttribute("hidden", "");
 					document.getElementById('game').removeAttribute('hidden');
-					document.getElementById('color-picker2').removeAttribute('hidden');
-					document.getElementById('help').removeAttribute('hidden');
 					if (!gameInit) {
 						document.getElementById('loading').removeAttribute('hidden');
 						// Timeout needed to start the rendering of loading animation (else will not be show)
@@ -60,11 +65,6 @@ import {QuestionService} from './questions/questionService.js';
 							document.getElementById('loading').setAttribute('hidden', '')
 						}, 50);
 					}
-				} else if (state === 'help') {
-					document.getElementById('hello-msg').removeAttribute("hidden");
-					document.getElementById('game').setAttribute('hidden', "");
-					document.getElementById('color-picker2').setAttribute('hidden', "");
-					document.getElementById('help').setAttribute('hidden', "");
 				}
 			})
 
@@ -73,17 +73,13 @@ import {QuestionService} from './questions/questionService.js';
 		 * Management of submission
 		 */
 
-		document.getElementById('btnSubmission').addEventListener('click', () => {
-			// When we submit a draw, we save it on firebase tree
-			fireBaseLego.database().ref("/draw").push(legoCanvas.export(fireBaseAuth.displayName(), fireBaseAuth.userId()));
-		});
 
 		/**
 		 * Management of menu items
 		 */
 
 		const menuGame = document.getElementById('menu-game');
-		const menuCreations = document.getElementById('menu-creations');
+		const menuAdmin = document.getElementById('menu-admin');
 
 
 		const streamGame = Rx.Observable
@@ -91,42 +87,22 @@ import {QuestionService} from './questions/questionService.js';
 			.map(() => 'game');
 
 		const streamCreations = Rx.Observable
-			.fromEvent(menuCreations, 'click')
-			.map(() => 'creations');
+			.fromEvent(menuAdmin, 'click')
+			.map(() => 'admin');
 
 		streamGame.merge(streamCreations)
 			.subscribe((state) => {
 				if (state === 'game'){
 					document.querySelector('.page-content').removeAttribute('hidden');
 					document.getElementById('submitted').setAttribute('hidden', '');
-					document.getElementById('menu-game').setAttribute('hidden', '');
-					document.getElementById('menu-creations').removeAttribute('hidden');
 					document.querySelector('.mdl-layout__drawer').classList.remove('is-visible');
 					document.querySelector('.mdl-layout__obfuscator').classList.remove('is-visible');
 
-				}else if (state === 'creations'){
+				}else if (state === 'admin'){
 					document.querySelector('.page-content').setAttribute('hidden', '');
 					document.getElementById('submitted').removeAttribute('hidden');
-					document.getElementById('menu-game').removeAttribute('hidden');
-					document.getElementById('menu-creations').setAttribute('hidden', '');
 					document.querySelector('.mdl-layout__drawer').classList.remove('is-visible');
 					document.querySelector('.mdl-layout__obfuscator').classList.remove('is-visible');
-
-					fireBaseLego.database().ref(`drawSaved/${fireBaseAuth.userId()}`).once('value', function (snapshot) {
-						if (snapshot && snapshot.val()) {
-							console.log(snapshot.val());
-							snapshotFb = snapshot.val();
-							keys = Object.keys(snapshotFb);
-							index = 0;
-							draw();
-						} else {
-							console.log('no draw !');
-						}
-
-					}, function (err) {
-						console.error(err);
-						// error callback triggered with PERMISSION_DENIED
-					});
 
 				}
 			});
@@ -144,7 +120,7 @@ import {QuestionService} from './questions/questionService.js';
 		const streamBtnRight =  Rx.Observable
 			.fromEvent(btnRight, 'click',()=>index = Math.min(index + 1, keys.length - 1));
 
-	   streamBtnLeft.merge(streamBtnRight).subscribe(draw);
+
 
 
 	}

@@ -44,6 +44,7 @@
 		<div class="mdl-layout__drawer">
 			<img src="./assets/img/ic_launcher_144.png" id="img-user" hiddden><span id="name-user" class="mdl-layout-title">Non Connecté</span>
 			<nav class="mdl-navigation">
+				<a class="mdl-navigation__link" id="menu-game" href="#" hidden>Jeu</a>
 				<a class="mdl-navigation__link" id="menu-admin" href="#" hidden>Admin</a>
 			</nav>
 		</div>
@@ -74,9 +75,12 @@
 					</div>
 				</div>
 				<div id="game" hidden>
-					<canvas id="canvasDraw"></canvas>
-					<button id="btnSubmission" class="mdl-button mdl-js-button mdl-button--raised mdl-js-ripple-effect mdl-button--accent">
-					Soumettre
+					<h1 id="question-title"></h1>
+					<button id="btnAnwser1" class="mdl-button mdl-js-button mdl-button--raised mdl-js-ripple-effect mdl-button--accent">
+					</button>
+					<button id="btnAnwser2" class="mdl-button mdl-js-button mdl-button--raised mdl-js-ripple-effect mdl-button--accent">
+					</button>
+					<button id="btnAnwser3" class="mdl-button mdl-js-button mdl-button--raised mdl-js-ripple-effect mdl-button--accent">
 					</button>
 				</div>
 				<div id="loading" hidden>
