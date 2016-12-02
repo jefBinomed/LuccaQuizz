@@ -1,12 +1,14 @@
 'use strict'
 import {FireBaseQuizzApp} from './firebase/firebase.js';
 import {FireBaseAuth} from './firebase/firebaseAuth.js';
+import {QuestionService} from './questions/questionService.js';
 
 
 (function () {
 
-	let fireBaseLego = null, // the reference of the fireBaseApp
-		index = 0;
+	let fireBaseQuizz = null, // the reference of the fireBaseApp
+		index = 0,
+		isAdmin = false;
 
 
 	function initGame() {
@@ -25,6 +27,8 @@ import {FireBaseAuth} from './firebase/firebaseAuth.js';
 			idImg: "img-user",
 			idDisplayName: "name-user"
 		});
+
+		new QuestionService();
 
 		/**
 		 * Management of Cinematic Buttons
