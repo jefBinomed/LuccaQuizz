@@ -1,6 +1,87 @@
+.mdl-layout__header-row{
+    img{
+        max-height: 90%;
+        margin-right: 20px;
+        left: 0px;
+        position:relative;
+    }
+}
+
+.mdl-layout .mdl-layout__content{
+    display: flex;
+
+    .page-content{
+        display: flex;
+        flex:1;
+        justify-content: center;
+        flex-direction: column;
+        position:relative;
+
+
+    }
+}
+
+.center{
+    text-align: center;
+}
+
+button.firebaseui-idp-button.mdl-button.mdl-js-button.mdl-button--raised.firebaseui-idp-twitter.firebaseui-id-idp-button{
+    background-color: #55acee;
+}
+
+button.firebaseui-idp-button.mdl-button.mdl-js-button.mdl-button--raised.firebaseui-idp-github.firebaseui-id-idp-button{
+    background-color: #333333;
+}
+
+button.firebaseui-idp-button.mdl-button.mdl-js-button.mdl-button--raised.firebaseui-idp-password.firebaseui-id-idp-button{
+    background-color: #db4437;
+}
+
+button.firebaseui-idp-button.mdl-button.mdl-js-button.mdl-button--raised.firebaseui-idp-facebook.firebaseui-id-idp-button{
+    background-color: #3b5998;
+}
+
+
 html, body{
 	margin:0;
 	padding:0;
 	display: flex;
 	background : #EFEFEF;
+}
+
+#hello-msg{
+    align-self: center;
+}
+
+#login-msg{
+    align-self: center;
+}
+
+$img-user : 80px;
+
+#img-user{
+    width:$img-user;
+    height: $img-user;
+    border-radius: $img-user;
+    background-size:cover;
+    border: thin solid black;
+    align-self: center;
+    margin-top: 10px;
+}
+
+
+#loading{
+    background: rgba(0,0,0,0.5);
+    position: absolute;
+    top: 0;
+    left: 0;
+    margin: 0;
+    padding: 0;
+    width: 100%;
+    height: 100%;
+    display: flex;
+    flex: 1;
+    justify-content: center;
+    flex-direction: column;
+    align-items: center;
 }
