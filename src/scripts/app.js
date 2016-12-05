@@ -1,7 +1,6 @@
 'use strict'
 import {FireBaseQuizzApp} from './firebase/firebase.js';
 import {FireBaseAuth} from './firebase/firebaseAuth.js';
-import {QuestionService} from './questions/questionService.js';
 import {Game} from './game/game.js';
 
 
@@ -17,7 +16,8 @@ import {Game} from './game/game.js';
 	function initGame() {
 		new Game({
 			btnIndex: 'btnAnwser',
-			btnNumbers : 3
+			btnNumbers : 3,
+			isAdmin : isAdmin
 		});
 
 	}
@@ -45,7 +45,6 @@ import {Game} from './game/game.js';
 			}
 		});
 
-		questionService = new QuestionService();
 
 		/**
 		 * Management of Cinematic Buttons

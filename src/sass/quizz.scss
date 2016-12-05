@@ -93,12 +93,19 @@ $img-user : 80px;
     align-items: center;
 
     h1{
+        font-size: 5em;
         color: #FF5722;
         font-weight: 600;
+    }
+
+    h3{
+        color:#424242;
+        width:80%;
     }
 
     .mdl-button{
         margin: 20px 0;
         width: 90%;
+        font-size:2em;
     }
 }
