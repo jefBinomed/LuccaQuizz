@@ -46,7 +46,7 @@ html, body{
 	margin:0;
 	padding:0;
 	display: flex;
-	background : #EFEFEF;
+    background: #CDDC39;
 }
 
 #hello-msg{
@@ -84,4 +84,21 @@ $img-user : 80px;
     justify-content: center;
     flex-direction: column;
     align-items: center;
+}
+
+
+#game{
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+
+    h1{
+        color: #FF5722;
+        font-weight: 600;
+    }
+
+    .mdl-button{
+        margin: 20px 0;
+        width: 90%;
+    }
 }
