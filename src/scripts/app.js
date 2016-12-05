@@ -2,17 +2,23 @@
 import {FireBaseQuizzApp} from './firebase/firebase.js';
 import {FireBaseAuth} from './firebase/firebaseAuth.js';
 import {QuestionService} from './questions/questionService.js';
+import {Game} from './game/game.js';
 
 
 (function () {
 
 	let fireBaseQuizz = null, // the reference of the fireBaseApp
 		index = 0,
-		isAdmin = false;
+		isAdmin = false,
+		gameInit = false,
+		questionService = null;
 
 
 	function initGame() {
-
+		new Game({
+			btnIndex: 'btnAnwser',
+			btnNumbers : 3
+		});
 
 	}
 
@@ -39,7 +45,7 @@ import {QuestionService} from './questions/questionService.js';
 			}
 		});
 
-		new QuestionService();
+		questionService = new QuestionService();
 
 		/**
 		 * Management of Cinematic Buttons
@@ -57,13 +63,13 @@ import {QuestionService} from './questions/questionService.js';
 					document.getElementById('hello-msg').setAttribute("hidden", "");
 					document.getElementById('game').removeAttribute('hidden');
 					if (!gameInit) {
-						document.getElementById('loading').removeAttribute('hidden');
+						gameInit = true;
+						initGame();
+						/*document.getElementById('loading').removeAttribute('hidden');
 						// Timeout needed to start the rendering of loading animation (else will not be show)
 						setTimeout(function () {
-								gameInit = true;
-								initGame();
 							document.getElementById('loading').setAttribute('hidden', '')
-						}, 50);
+						}, 50);*/
 					}
 				}
 			})
