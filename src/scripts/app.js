@@ -7,6 +7,7 @@ import {Game} from './game/game.js';
 (function () {
 
 	let fireBaseQuizz = null, // the reference of the fireBaseApp
+		fireBaseAuth = null,
 		index = 0,
 		isAdmin = false,
 		gameInit = false,
@@ -17,7 +18,9 @@ import {Game} from './game/game.js';
 		new Game({
 			btnIndex: 'btnAnwser',
 			btnNumbers : 3,
-			isAdmin : isAdmin
+			isAdmin : isAdmin,
+			firebaseApp : fireBaseQuizz,
+			firebaseAuth : fireBaseAuth
 		});
 
 	}
@@ -26,7 +29,7 @@ import {Game} from './game/game.js';
 
 		fireBaseQuizz = new FireBaseQuizzApp().app;
 		// We init the authentication object
-		let fireBaseAuth = new FireBaseAuth({
+		fireBaseAuth = new FireBaseAuth({
 			idDivLogin: 'login-msg',
 			idNextDiv: 'hello-msg',
 			idLogout: 'signout',

@@ -111,4 +111,14 @@ $img-user : 80px;
         width: 90%;
         font-size:2em;
     }
+
+    .parent-btns{
+        display: flex;
+
+        .mdl-button{
+            width: 300px;
+            font-size: 2em;
+            margin: 0 20px;
+        }
+    }
 }
