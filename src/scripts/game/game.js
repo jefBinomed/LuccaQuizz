@@ -8,7 +8,7 @@ class ModelGame{
 		this.indexQuestion = 0;
 		this.currentAnswer = -1;
 		this.isAdmin = false;
-		this.score = 0; 
+		this.score = 0;
 	}
 }
 
@@ -37,15 +37,18 @@ export class Game{
 
 		this.questionArray = new Array();
 
-		// FireBase 
+		// FireBase
 		this.firebaseApp = firebaseApp;
 		this.firebaseAuth = firebaseAuth;
 
 		this._initGame();
 	}
 
+	/**
+	 * Init services / questions / ...
+	 */
 	_initGame(){
-		// Start the service 
+		// Start the service
 		const questionService = new QuestionService();
 		questionService.retrieveQuestions()
 		.then(questionArray=>{
@@ -60,14 +63,17 @@ export class Game{
 			this.eltHelp.setAttribute('hidden', '');
 			this.btnNext.setAttribute('hidden', '');
 			this.btnPrev.setAttribute('hidden', '');
+			this.firebaseApp.database().ref(`scores/${this.firebaseAuth.userId()}`).update({
+				user : this.firebaseAuth.displayName()
+			});
 		}else{
 			// Add interactivity
 			const streamLeft = Rx.Observable.fromEvent(this.btnPrev, 'click')
 				.map(() => 'prev');
-			
+
 			const streamRight = Rx.Observable.fromEvent(this.btnNext, 'click')
 				.map(() => 'next');
-			
+
 			const streamConfirm = Rx.Observable.fromEvent(this.btnConfirm, 'click')
 				.map(() => 'confirm');
 
@@ -76,11 +82,12 @@ export class Game{
 				.subscribe((state) => {
 					let tempAnswer = -1;
 					if (state === 'prev'){
-						this.model.indexQuestion = Math.max(0, this.model.indexQuestion - 1);						
+						this.model.indexQuestion = Math.max(0, this.model.indexQuestion - 1);
 					}else if (state === 'next'){
-						this.model.indexQuestion = Math.min(this.questionArray.length, this.model.indexQuestion + 1);						
+						this.model.indexQuestion = Math.min(this.questionArray.length, this.model.indexQuestion + 1);
 					}else if (state === 'confirm'){
 						tempAnswer = this.model.currentAnswer;
+						this._computeResults();
 					}
 					this.firebaseApp.database().ref('currentQuestion').set({
 						indexQuestion : this.model.indexQuestion,
@@ -93,6 +100,54 @@ export class Game{
 		this.firebaseApp.database().ref('currentQuestion').on('value', this._updateData.bind(this));
 	}
 
+	/**
+	 * Calculate the results and update the tree
+	 */
+	_computeResults(){
+		this.firebaseApp.database().ref(`anwsers/question${this.model.indexQuestion}`).once('value', (snapshot)=>{
+			const fbSnapshot = snapshot.val();
+			const usersIdKeys = Object.keys(fbSnapshot);
+
+			if (usersIdKeys.length > 0 && fbSnapshot[usersIdKeys[0]].treat){
+				return;
+			}
+
+			const arrayGoodAnswer = new Array();
+			const arrayWrongAnswer = new Array();
+
+			usersIdKeys.forEach(userId =>{
+				const anwserUser = fbSnapshot[userId];
+				anwserUser.treat = true;
+				if (anwserUser.anwser === this.model.currentAnswer){
+					arrayGoodAnswer.push(anwserUser);
+				}else{
+					arrayWrongAnswer.push(anwserUser);
+				}
+			});
+
+
+			let pointToDistribute = 100;
+			const delta = pointToDistribute / arrayGoodAnswer.length;
+			arrayGoodAnswer
+			.sort((anwserA, anwserB)=>{
+				return anwserA.timestamp - anwserB.timestamp
+			})
+			.forEach(anwserUser=>{
+				this.firebaseApp.database().ref(`scores/${anwserUser.user.id}/question${this.model.indexQuestion}`).set({
+					score : pointToDistribute
+				});
+				pointToDistribute -= delta;
+			});
+
+			//We update the tree to tell that the node has already be treat
+			this.firebaseApp.database().ref(`anwsers/question${this.model.indexQuestion}`).set(fbSnapshot);
+
+		});
+	}
+
+	/**
+	 * Update datas recieve from firebase
+	 */
 	_updateData(snapshot){
 		if (this.questionArray.length === 0){
 			return;
@@ -105,7 +160,7 @@ export class Game{
 			if (valueQuestion.anwser != -1){
 				// TODO gestion des points
 			}
-		}else if (this.model.isAdmin){			
+		}else if (this.model.isAdmin){
 			this.firebaseApp.database().ref('currentQuestion').set({
 				indexQuestion : 0,
 				anwser : -1,
@@ -114,6 +169,9 @@ export class Game{
 		}
 	}
 
+	/**
+	 * Reset bouttons states
+	 */
 	_resetBtns(){
 		this.btns.forEach(btn=>{
 			btn.classList.remove('mdl-button--colored');
@@ -121,16 +179,19 @@ export class Game{
 		})
 	}
 
+	/**
+	 * Callback method when click on an anwser button
+	 */
 	_clickAnwser(event){
 		this._resetBtns();
 		event.target.classList.remove('mdl-button--accent');
 		event.target.classList.add('mdl-button--colored');
 		const results = this.regex.exec(event.target.id);
 		this.model.currentAnswer = (results.length > 0) ? +results[1] : -1;
-				
+
 		if (this.model.isAdmin){
 			this.btnConfirm.removeAttribute('hidden');
-		}else if (this.model.currentAnswer != -1){ 
+		}else if (this.model.currentAnswer != -1){
 			this.firebaseApp.database().ref(`anwsers/question${this.model.indexQuestion}/${this.firebaseAuth.userId()}`)
 				.set({
 					timestamp : Date.now(),
@@ -143,13 +204,16 @@ export class Game{
 		}
 	}
 
+	/**
+	 * Fill the html elements with question
+	 */
 	_fillQuestion(question){
 		this.btnConfirm.setAttribute('hidden', '');
-		this.eltTitle.innerHTML = question.title;
+		this.eltTitle.innerHTML = `Question ${this.model.indexQuestion + 1} / ${this.questionArray.length} : <br> ${question.title} `;
 		this.eltHelp.innerHTML = question.help;
 		let indexAnswer = 0;
 		this.btns.forEach(btn=>{
-			btn.innerHTML = question.propositions[indexAnswer];
+			btn.innerHTML = question.list()[indexAnswer];
 			indexAnswer++;
 		})
 	}
