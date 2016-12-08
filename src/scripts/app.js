@@ -10,6 +10,7 @@ import {Game} from './game/game.js';
 		fireBaseAuth = null,
 		index = 0,
 		isAdmin = false,
+		isConnected = false,
 		gameInit = false,
 		questionService = null;
 
@@ -18,6 +19,7 @@ import {Game} from './game/game.js';
 		new Game({
 			btnIndex: 'btnAnwser',
 			btnNumbers : 3,
+			isConnected : isConnected,
 			isAdmin : isAdmin,
 			firebaseApp : fireBaseQuizz,
 			firebaseAuth : fireBaseAuth
@@ -38,6 +40,7 @@ import {Game} from './game/game.js';
 		});
 
 		fireBaseAuth.onAuthStateChanged((user)=>{
+			isConnected = user;
 			if (user){
 				fireBaseQuizz.database().ref("/admins").once('value', (snapshot)=>{
 					isAdmin = true;
@@ -53,13 +56,18 @@ import {Game} from './game/game.js';
 		 * Management of Cinematic Buttons
 		 */
 		const startBtn = document.getElementById('startBtn');
+		const consultBtn = document.getElementById('consultBtn');
 
 		const streamStart = Rx.Observable
 			.fromEvent(startBtn, 'click')
 			.map(() => 'start');
 
+		const streamConsult = Rx.Observable
+			.fromEvent(consultBtn, 'click')
+			.map(() => 'consult');
 
-		streamStart
+
+		streamStart.merge(streamConsult)
 			.subscribe((state) => {
 				if (state === 'start') {
 					document.getElementById('hello-msg').setAttribute("hidden", "");
@@ -67,11 +75,14 @@ import {Game} from './game/game.js';
 					if (!gameInit) {
 						gameInit = true;
 						initGame();
-						/*document.getElementById('loading').removeAttribute('hidden');
-						// Timeout needed to start the rendering of loading animation (else will not be show)
-						setTimeout(function () {
-							document.getElementById('loading').setAttribute('hidden', '')
-						}, 50);*/
+					}
+				}else if (state === 'consult') {
+					document.getElementById('login-msg').setAttribute("hidden", "");
+					document.getElementById('hello-msg').setAttribute("hidden", "");
+					document.getElementById('game').removeAttribute('hidden');
+					if (!gameInit) {
+						gameInit = true;
+						initGame();
 					}
 				}
 			})

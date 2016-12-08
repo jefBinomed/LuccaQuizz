@@ -8,12 +8,13 @@ class ModelGame{
 		this.indexQuestion = 0;
 		this.currentAnswer = -1;
 		this.isAdmin = false;
+		this.isConnected = false;
 		this.score = 0;
 	}
 }
 
 export class Game{
-	constructor({btnIndex = 'btnAnwser', btnNumbers = 3, isAdmin = false, firebaseApp, firebaseAuth}){
+	constructor({btnIndex = 'btnAnwser', btnNumbers = 3, isConnected = false, isAdmin = false, firebaseApp, firebaseAuth}){
 		// Manage html
 		this.regex = new RegExp(btnIndex+'([0-9])');
 		this.btns = new Array();
@@ -34,6 +35,7 @@ export class Game{
 		// Model
 		this.model = new ModelGame();
 		this.model.isAdmin = isAdmin;
+		this.model.isConnected = isConnected;
 
 		this.questionArray = new Array();
 

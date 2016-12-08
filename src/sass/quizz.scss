@@ -58,6 +58,11 @@ html, body{
 
 #login-msg{
     align-self: center;
+
+    .mdl-card__actions.mdl-card--border{
+        display: flex;
+        flex-direction: column;
+    }
 }
 
 $img-user : 80px;
