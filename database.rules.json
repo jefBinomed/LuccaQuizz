@@ -1,0 +1,22 @@
+{
+  "rules":{
+    "admins": {
+      ".read": "auth != null && root.child('admins').child(auth.token.email.replace('.', '*')).exists() && auth.token.email_verified == true",
+      ".write": false
+    },
+    "currentQuestion": {
+      ".read": "auth != null",
+      ".write": "auth != null && root.child('admins').child(auth.token.email.replace('.', '*')).exists() && auth.token.email_verified == true"
+    },
+    "anwsers":{
+      ".read": "auth != null && root.child('admins').child(auth.token.email.replace('.', '*')).exists() && auth.token.email_verified == true",
+      ".write": "auth != null"
+    },
+    "scores":{
+      "$userId":{
+      	".read": true,
+      	".write": "auth != null && ($userId === auth.uid || (root.child('admins').child(auth.token.email.replace('.', '*')).exists() && auth.token.email_verified == true))"
+      }
+    }
+  }
+}

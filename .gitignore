@@ -46,7 +46,6 @@ src/assets/video/
 node_modules/
 public/
 
-.firebaserc
 bundle*
 
 yarn.lock
