@@ -56,7 +56,6 @@ export class Game{
 		.then(questionArray=>{
 			this.questionArray = questionArray;
 			this._fillQuestion(questionArray[0]);
-
 		});
 
 		// Manage visibility
@@ -68,7 +67,7 @@ export class Game{
 			this.firebaseApp.database().ref(`scores/${this.firebaseAuth.userId()}`).update({
 				user : this.firebaseAuth.displayName()
 			});
-		}else{
+		}else if(this.model.isConnected){
 			// Add interactivity
 			const streamLeft = Rx.Observable.fromEvent(this.btnPrev, 'click')
 				.map(() => 'prev');
@@ -159,8 +158,8 @@ export class Game{
 			const valueQuestion = snapshot.val();
 			this._fillQuestion(this.questionArray[valueQuestion.indexQuestion]);
 			this.model.indexQuestion = valueQuestion.indexQuestion;
-			if (valueQuestion.anwser != -1){
-				// TODO gestion des points
+			if (valueQuestion.anwser != -1 && !this.model.isConnected){
+				this.firebaseApp.database().ref('scores').once('value', this._showResults.bind(this));
 			}
 		}else if (this.model.isAdmin){
 			this.firebaseApp.database().ref('currentQuestion').set({
@@ -220,5 +219,9 @@ export class Game{
 		})
 	}
 
+
+	_showResults(snapshotResults){
+
+	}
 
 }
