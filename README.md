@@ -1,4 +1,4 @@
-https://codeship.com/projects/199843f0-9f93-0134-35c2-12693457aba7/status?branch=master
+[ ![Codeship Status for jefBinomed/LuccaQuizz](https://app.codeship.com/projects/199843f0-9f93-0134-35c2-12693457aba7/status?branch=master)](https://app.codeship.com/projects/189335)
 
 # LuccaQuizz
 Quizz PWA based on firebase
