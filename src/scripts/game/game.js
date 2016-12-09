@@ -156,8 +156,8 @@ export class Game{
 		if (snapshot.val()){
 			this._resetBtns();
 			const valueQuestion = snapshot.val();
-			this._fillQuestion(this.questionArray[valueQuestion.indexQuestion]);
 			this.model.indexQuestion = valueQuestion.indexQuestion;
+			this._fillQuestion(this.questionArray[valueQuestion.indexQuestion]);
 			if (valueQuestion.anwser != -1 && !this.model.isConnected){
 				this.firebaseApp.database().ref('scores').once('value', this._showResults.bind(this));
 			}
