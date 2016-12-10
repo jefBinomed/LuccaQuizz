@@ -48,4 +48,6 @@ public/
 
 bundle*
 
+.fuse*
+
 yarn.lock
