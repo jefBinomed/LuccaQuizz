@@ -54,6 +54,10 @@ html, body{
 
 #hello-msg{
     align-self: center;
+    .mdl-card__actions.mdl-card--border{
+        display: flex;
+        flex-direction: column;
+    }
 }
 
 #login-msg{
