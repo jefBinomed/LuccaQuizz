@@ -26,6 +26,8 @@ export class Game{
 		// Manage html elements
 		this.eltTitle = document.getElementById('questionTitle');
 		this.eltHelp = document.getElementById('help');
+		this.eltGame = document.getElementById('game');
+		this.eltScores = document.getElementById('scores');
 
 		// Add btns
 		this.btnConfirm = document.getElementById('confirmBtn');
@@ -64,9 +66,11 @@ export class Game{
 			this.eltHelp.setAttribute('hidden', '');
 			this.btnNext.setAttribute('hidden', '');
 			this.btnPrev.setAttribute('hidden', '');
-			this.firebaseApp.database().ref(`scores/${this.firebaseAuth.userId()}`).update({
-				user : this.firebaseAuth.displayName()
-			});
+			if (this.model.isConnected){
+				this.firebaseApp.database().ref(`scores/${this.firebaseAuth.userId()}`).update({
+					user : this.firebaseAuth.displayName()
+				});
+			}
 		}else if(this.model.isConnected){
 			// Add interactivity
 			const streamLeft = Rx.Observable.fromEvent(this.btnPrev, 'click')
@@ -159,7 +163,14 @@ export class Game{
 			this.model.indexQuestion = valueQuestion.indexQuestion;
 			this._fillQuestion(this.questionArray[valueQuestion.indexQuestion]);
 			if (valueQuestion.anwser != -1 && !this.model.isConnected){
-				this.firebaseApp.database().ref('scores').once('value', this._showResults.bind(this));
+				this.btns[valueQuestion.anwser - 1].classList.remove('mdl-button--accent');
+				this.btns[valueQuestion.anwser - 1].classList.add('mdl-button--colored');
+				setTimeout(() =>{					
+					this.firebaseApp.database().ref('scores').once('value', this._showResults.bind(this));
+				}, 1000);
+				
+			}else if (valueQuestion.anwser === -1 && !this.model.isConnected){
+				this._hideResults();
 			}
 		}else if (this.model.isAdmin){
 			this.firebaseApp.database().ref('currentQuestion').set({
@@ -221,6 +232,103 @@ export class Game{
 
 
 	_showResults(snapshotResults){
+		
+		this.eltGame.classList.remove('show');
+		this.eltGame.classList.add('hide');
+		setTimeout(() =>{
+			this.eltGame.setAttribute('hidden','');
+
+			this.eltScores.removeAttribute('hidden');
+			this.eltScores.classList.remove('hide');
+			this.eltScores.classList.add('show');
+
+			const userElt1 = document.getElementById('scoreUser1');
+			const userElt2 = document.getElementById('scoreUser2');
+			const userElt3 = document.getElementById('scoreUser3');
+			const userElt4 = document.getElementById('scoreUser4');
+			const userElt5 = document.getElementById('scoreUser5');
+
+			userElt1.setAttribute('hidden','');
+			userElt2.setAttribute('hidden','');
+			userElt3.setAttribute('hidden','');
+			userElt4.setAttribute('hidden','');
+			userElt5.setAttribute('hidden','');
+
+			const valueResults = snapshotResults.val();
+			const usersIdKeys = Object.keys(valueResults);
+
+			const userArray = new Array();
+
+			usersIdKeys.forEach(userId =>{
+				const scoresUser = valueResults[userId];
+				scoresUser.score = 0;
+				for (let index = 1; index <= this.model.indexQuestion; index++){
+					if (scoresUser[`question${index}`]){
+						scoresUser.score += scoresUser[`question${index}`].score;
+					}
+				}
+				userArray.push(scoresUser);
+			});
+
+			const finalUsers = userArray
+			.sort((userA, userB)=>{
+				return userA.score < userB.score;
+			})
+			.filter((elt, index)=>{
+				return index < 5;
+			});
+
+			switch(finalUsers.length){
+				case 5:
+					userElt5.removeAttribute('hidden');				
+				case 4:
+					userElt4.removeAttribute('hidden');				
+				case 3:
+					userElt3.removeAttribute('hidden');				
+				case 2:
+					userElt2.removeAttribute('hidden');				
+				case 1:
+					userElt1.removeAttribute('hidden');				
+			}
+
+			finalUsers.forEach((user, index)=>{
+				let userEltTemp = userElt1;
+				switch(index){
+					case 1:
+						userEltTemp = userElt2;
+						break;
+					case 2:
+						userEltTemp = userElt3;
+						break;
+					case 3:
+						userEltTemp = userElt4;
+						break;
+					case 4:
+						userEltTemp = userElt5;
+						break;
+				}
+
+				userEltTemp.querySelector('.user').innerHTML = `${index + 1} - ${user.user}`;
+				userEltTemp.querySelector('.score').innerHTML = user.score;
+			});
+		}, 500);
+
+
+	}
+
+	_hideResults(){
+		
+		this.eltScores.classList.remove('show');
+		this.eltScores.classList.add('hide');
+
+		setTimeout(() =>{
+			this.eltScores.setAttribute('hidden','');
+
+			this.eltGame.removeAttribute('hidden');
+			this.eltGame.classList.remove('hide');
+			this.eltGame.classList.add('show');
+		}, 500);
+
 
 	}
 
