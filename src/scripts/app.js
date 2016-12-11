@@ -12,7 +12,8 @@ import {Game} from './game/game.js';
 		isAdmin = false,
 		isConnected = false,
 		gameInit = false,
-		questionService = null;
+		questionService = null, 
+		registrationServiceWorker = null;
 
 
 	function initGame() {
@@ -30,6 +31,7 @@ import {Game} from './game/game.js';
 	function pageLoad() {
 
 		fireBaseQuizz = new FireBaseQuizzApp().app;
+
 		// We init the authentication object
 		fireBaseAuth = new FireBaseAuth({
 			idDivLogin: 'login-msg',
@@ -140,19 +142,62 @@ import {Game} from './game/game.js';
 			.fromEvent(btnRight, 'click',()=>index = Math.min(index + 1, keys.length - 1));
 
 
+		checkUpdateVersion();
 
+	}
+
+	function checkUpdateVersion(){
+		if (!fireBaseQuizz || !registrationServiceWorker){
+			return;
+		}
+		// We check for updating or not the service worker according to the version of app
+		fireBaseQuizz.database().ref('currentQuestion').on('value', (snaphotCurrentQuestion)=>{
+			const currentQuestion = snaphotCurrentQuestion.val();
+			if (currentQuestion){
+				if (localStorage['appVersion'] && localStorage['appVersion'] != ''+currentQuestion.appVersion){
+					console.debug('Detect a new version => update is request')
+					localStorage.removeItem('serviceWorkerUpdateDone');
+					localStorage.removeItem('serviceWorkerUpdate');
+					registrationServiceWorker.update();
+					
+				}
+				localStorage['appVersion'] = currentQuestion.appVersion;
+			}
+		});
 
 	}
 
 
 	window.addEventListener('load', pageLoad);
 
-	/* SERVICE_WORKER_REPLACE
+	/* SERVICE_WORKER_REPLACE 
 	if ('serviceWorker' in navigator) {
 		navigator.serviceWorker.register('./service-worker.js', {scope : location.pathname}).then(function(reg) {
 			console.log('Service Worker Register for scope : %s',reg.scope);
+			registrationServiceWorker = reg;
+			checkUpdateVersion();
+			reg.addEventListener('updatefound', ()=>{
+				console.debug('update service worker found !');
+				localStorage['serviceWorkerUpdate'] = true;
+				if (!localStorage['serviceWorkerUpdateDone']){
+					location.reload();
+				}				
+			});
+			var serviceWorker;
+			if (reg.active) {
+				serviceWorker = reg.active;
+				console.debug('Service Worker is Active, will refresh !');
+				if (localStorage['serviceWorkerUpdate']){
+					localStorage.removeItem('serviceWorkerUpdate');
+					if (!localStorage['serviceWorkerUpdateDone']){
+						location.reload();
+					}
+					localStorage['serviceWorkerUpdateDone'] = true;
+				}
+			}
+			
 		});
 	}
-	SERVICE_WORKER_REPLACE */
+	 SERVICE_WORKER_REPLACE */
 
 })();
