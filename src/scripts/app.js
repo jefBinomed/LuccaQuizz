@@ -156,9 +156,14 @@ import {Game} from './game/game.js';
 			if (currentQuestion){
 				if (localStorage['appVersion'] && localStorage['appVersion'] != ''+currentQuestion.appVersion){
 					console.debug('Detect a new version => update is request')
-					localStorage.removeItem('serviceWorkerUpdateDone');
-					localStorage.removeItem('serviceWorkerUpdate');
-					registrationServiceWorker.update();
+					if ('serviceWorker' in navigator){
+						localStorage.removeItem('serviceWorkerUpdateDone');
+						localStorage.removeItem('serviceWorkerUpdate');
+						registrationServiceWorker.update();
+					}else{
+						location.reload();
+					}
+					
 					
 				}
 				localStorage['appVersion'] = currentQuestion.appVersion;
