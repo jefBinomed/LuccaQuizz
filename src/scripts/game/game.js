@@ -21,7 +21,7 @@ export class Game{
 		for (let i = 1; i <= btnNumbers; i++){
 			let btn = document.getElementById(`${btnIndex}${i}`);
 			this.btns.push(btn);
-			if (!isAdmin && isConnected){
+			if (isConnected){
 				btn.addEventListener('click', this._clickAnwser.bind(this));
 			}
 		}
@@ -106,10 +106,8 @@ export class Game{
 					});
 				});
 		}
-
-
 	}
-
+	
 	/**
 	 * Calculate the results and update the tree
 	 */

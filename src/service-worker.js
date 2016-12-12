@@ -3,6 +3,18 @@
 let cacheFileName = "luccaQuizzCache-v{timestamp}";
 let cacheCdnName = "luccaQuizzCdnCache-v1";
 
+let filesToCacheNew = [
+	'./',
+	'./index.html',
+	'./bundle.js',
+	'./css/quizz.css',
+	'./assets/img/ic_launcher_new_48.png',
+	'./assets/img/ic_launcher_new_144.png',
+	'./assets/img/ic_launcher_new_192.png',
+	'./assets/img/ic_launcher_new_512.png',
+	'./manifest_new.json'
+]
+
 let filesToCache = [
 	'./',
 	'./index.html',
@@ -14,6 +26,8 @@ let filesToCache = [
 	'./assets/img/ic_launcher_512.png',
 	'./manifest.json'
 ];
+
+//filesToCache = filesToCacheNew;
 
 let cdnToCache = [
   "https://fonts.googleapis.com/",
