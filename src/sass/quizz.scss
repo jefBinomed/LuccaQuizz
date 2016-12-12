@@ -220,7 +220,10 @@ $img-user : 80px;
     }
 }
 
-
+.mdl-navigation__link.bottom{
+    position: fixed;
+    bottom: 20px;
+}
 
 
 @media only screen and (max-width: 768px) {
