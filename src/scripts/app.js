@@ -12,7 +12,7 @@ import {Game} from './game/game.js';
 		isAdmin = false,
 		isConnected = false,
 		gameInit = false,
-		questionService = null, 
+		questionService = null,
 		registrationServiceWorker = null;
 
 
@@ -120,10 +120,22 @@ import {Game} from './game/game.js';
 					document.querySelector('.mdl-layout__obfuscator').classList.remove('is-visible');
 
 				}else if (state === 'admin'){
-					document.querySelector('.page-content').setAttribute('hidden', '');
-					document.getElementById('submitted').removeAttribute('hidden');
-					document.querySelector('.mdl-layout__drawer').classList.remove('is-visible');
-					document.querySelector('.mdl-layout__obfuscator').classList.remove('is-visible');
+					fireBaseQuizz.database().ref('anwsers').once('value', (snapshotAnwsers)=>{
+						const anwsers = snapshotAnwsers.val();
+						if (anwsers){
+							const keyQuestions = Object.keys(anwsers);
+							keyQuestions.forEach(questionEntry=>{
+								const questionTmp = anwsers[questionEntry];
+								const userKeys = Object.keys(questionTmp);
+								userKeys.forEach(userId=>{
+									const userTmp = questionTmp[userId];
+									delete userTmp.treat;
+								});
+							});
+
+							fireBaseQuizz.database().ref('anwsers').update(anwsers);
+						}
+					});
 
 				}
 			});
@@ -163,8 +175,8 @@ import {Game} from './game/game.js';
 					}else{
 						location.reload();
 					}
-					
-					
+
+
 				}
 				localStorage['appVersion'] = currentQuestion.appVersion;
 			}
@@ -175,7 +187,7 @@ import {Game} from './game/game.js';
 
 	window.addEventListener('load', pageLoad);
 
-	/* SERVICE_WORKER_REPLACE 
+	/* SERVICE_WORKER_REPLACE
 	if ('serviceWorker' in navigator) {
 		navigator.serviceWorker.register('./service-worker.js', {scope : location.pathname}).then(function(reg) {
 			console.log('Service Worker Register for scope : %s',reg.scope);
@@ -186,7 +198,7 @@ import {Game} from './game/game.js';
 				localStorage['serviceWorkerUpdate'] = true;
 				if (!localStorage['serviceWorkerUpdateDone']){
 					location.reload();
-				}				
+				}
 			});
 			var serviceWorker;
 			if (reg.active) {
@@ -200,7 +212,7 @@ import {Game} from './game/game.js';
 					localStorage['serviceWorkerUpdateDone'] = true;
 				}
 			}
-			
+
 		});
 	}
 	 SERVICE_WORKER_REPLACE */
