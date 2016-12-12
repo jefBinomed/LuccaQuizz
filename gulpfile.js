@@ -21,7 +21,8 @@ var extensions = ['.js','.json','.es6'];
 
 gulp.task('watch',['browserify', 'sass'], function(){
   browserSync.init({
-     server:'./src'
+     server:'./src',
+     ghostMode: false
   });
   gulp.watch("./src/sass/**/*.scss", ['sass']);
   gulp.watch("./src/scripts/**/*.js", ['browserify']);
