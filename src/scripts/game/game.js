@@ -5,7 +5,7 @@ const appVersion = 1;
 
 class ModelGame{
 	constructor(){
-		this.indexQuestion = 0; // Start from 0 ! 
+		this.indexQuestion = 0; // Start from 0 !
 		this.currentAnswer = -1; // -1 === no validate anwser
 		this.isAdmin = false;
 		this.isConnected = false;
@@ -87,14 +87,14 @@ export class Game{
 
 			streamLeft.merge(streamRight)
 				.merge(streamConfirm)
-				.subscribe((state) => {					
+				.subscribe((state) => {
 					if (state === 'prev'){
 						this.model.indexQuestion = Math.max(0, this.model.indexQuestion - 1);
 						this._fillQuestion(this.questionArray[this.model.indexQuestion]);
 					}else if (state === 'next'){
 						this.model.indexQuestion = Math.min(this.questionArray.length, this.model.indexQuestion + 1);
 						this._fillQuestion(this.questionArray[this.model.indexQuestion]);
-					}else if (state === 'confirm'){						
+					}else if (state === 'confirm'){
 						this._computeResults();
 					}
 					this.firebaseApp.database().ref('currentQuestion').update({
@@ -105,7 +105,7 @@ export class Game{
 				});
 		}
 
-		
+
 	}
 
 	/**
@@ -205,7 +205,7 @@ export class Game{
 				if (!this.model.isConnected){
 					this.btns[valueQuestion.anwser - 1].classList.remove('mdl-button--accent');
 					this.btns[valueQuestion.anwser - 1].classList.add('mdl-button--colored');
-					setTimeout(() =>{					
+					setTimeout(() =>{
 						// We will now request the results to display the rank of users
 						this.firebaseApp.database().ref('scores').once('value', this._showResults.bind(this));
 					}, 1000);
@@ -215,11 +215,11 @@ export class Game{
 						.ref(`scores/${this.firebaseAuth.userId()}/question${valueQuestion.indexQuestion}/`)
 						.once('value', this._showCurrentScore.bind(this));
 				}
-				
-				// Else if we're  the consult screen (not connected) and the value is -1 => we have to show the question 
+
+				// Else if we're  the consult screen (not connected) and the value is -1 => we have to show the question
 			}else if (valueQuestion.anwser === -1 && !this.model.isConnected){
 				this._hideResults();
-			}		
+			}
 		}
 	}
 
@@ -301,9 +301,12 @@ export class Game{
 
 		userArray
 		.sort((userA, userB)=>{
-			return userA.score < userB.score;
+			return userB.score - userA.score;
 		})
 		.forEach((user, index)=>{
+			if (!user[`question${this.model.indexQuestion}`]){
+				user[`question${this.model.indexQuestion}`] = {score: 0};
+			}
 			user[`question${this.model.indexQuestion}`].scoreCompute = user.score;
 			user[`question${this.model.indexQuestion}`].position = index + 1;
 
@@ -321,7 +324,7 @@ export class Game{
 		.then(_=>{
 			const tempAnswer = this.model.currentAnswer;
 			this.firebaseApp.database().ref('currentQuestion').update({
-				anwser : tempAnswer					
+				anwser : tempAnswer
 			});
 		});
 
@@ -333,14 +336,14 @@ export class Game{
 	 * Show the results on main screen
 	 */
 	_showResults(snapshotResults){
-		
+
 		// We play with the hide / show elements to hide game div and show scores div
 		this.eltGame.classList.remove('show');
 		this.eltGame.classList.add('hide');
 		// We wait a litle (time for animation css of hiding game is finish)
 		setTimeout(() =>{
 			this.eltGame.setAttribute('hidden','');
- 
+
 			this.eltScores.removeAttribute('hidden');
 			this.eltScores.classList.remove('hide');
 			this.eltScores.classList.add('show');
@@ -364,17 +367,22 @@ export class Game{
 
 			const userArray = new Array();
 
-			usersIdKeys.forEach(userId =>{
+			usersIdKeys
+			.filter(userId =>{
+				const scoresUser = valueResults[userId];
+				return scoresUser[`question${this.model.indexQuestion}`];
+			})
+			.forEach(userId =>{
 				const scoresUser = valueResults[userId];
 				// We get the score calculate by the admin and set it as a reference
-				scoresUser.score = scoresUser[`question${this.model.indexQuestion}`].scoreCompute;				
+				scoresUser.score = scoresUser[`question${this.model.indexQuestion}`].scoreCompute;
 				userArray.push(scoresUser);
 			});
 
 			// We sort the final array and only take the 5 first
 			const finalUsers = userArray
 			.sort((userA, userB)=>{
-				return userA.score < userB.score;
+				return userB.score - userA.score;
 			})
 			.filter((elt, index)=>{
 				return index < 5;
@@ -382,15 +390,15 @@ export class Game{
 
 			switch(finalUsers.length){
 				case 5:
-					userElt5.removeAttribute('hidden');				
+					userElt5.removeAttribute('hidden');
 				case 4:
-					userElt4.removeAttribute('hidden');				
+					userElt4.removeAttribute('hidden');
 				case 3:
-					userElt3.removeAttribute('hidden');				
+					userElt3.removeAttribute('hidden');
 				case 2:
-					userElt2.removeAttribute('hidden');				
+					userElt2.removeAttribute('hidden');
 				case 1:
-					userElt1.removeAttribute('hidden');				
+					userElt1.removeAttribute('hidden');
 			}
 
 			// Finally we show the name of the user and it's score'
@@ -434,7 +442,7 @@ export class Game{
 	 * Simply hide the results
 	 */
 	_hideResults(){
-		
+
 		this.eltScores.classList.remove('show');
 		this.eltScores.classList.add('hide');
 
