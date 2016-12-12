@@ -21,7 +21,9 @@ export class Game{
 		for (let i = 1; i <= btnNumbers; i++){
 			let btn = document.getElementById(`${btnIndex}${i}`);
 			this.btns.push(btn);
-			btn.addEventListener('click', this._clickAnwser.bind(this));
+			if (!isAdmin && isConnected){
+				btn.addEventListener('click', this._clickAnwser.bind(this));
+			}
 		}
 		// Manage html elements
 		this.eltTitle = document.getElementById('questionTitle');
