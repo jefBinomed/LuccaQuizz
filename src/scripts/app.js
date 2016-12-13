@@ -193,7 +193,7 @@ import {Game} from './game/game.js';
 			console.log('Service Worker Register for scope : %s',reg.scope);
 			registrationServiceWorker = reg;
 			checkUpdateVersion();
-			reg.addEventListener('updatefound', ()=>{
+			reg.addEventListener('updatefound', function(){
 				console.debug('update service worker found !');
 				localStorage['serviceWorkerUpdate'] = true;
 				if (!localStorage['serviceWorkerUpdateDone']){
