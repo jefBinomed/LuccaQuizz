@@ -1,7 +1,7 @@
 'use strict';
 
 let cacheFileName = "luccaQuizzCache-v{timestamp}";
-let cacheCdnName = "luccaQuizzCdnCache-v1";
+let cacheCdnName = "luccaQuizzCdnCache-v2";
 
 let filesToCacheNew = [
 	'./',
@@ -37,7 +37,8 @@ let cdnToCache = [
   "https://rawgit.com/",
   "https://www.google-analytics.com/",
   "https://code.getmdl.io/",
-  "https://fonts.gstatic.com/"
+  "https://fonts.gstatic.com/",
+  "https://raw.githubusercontent.com"
 ];
 
 self.addEventListener('install', function(e) {
