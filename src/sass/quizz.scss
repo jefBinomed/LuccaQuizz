@@ -134,14 +134,14 @@ $img-user : 80px;
     }
 
     transition: all 1s linear;
-    &.show{        
+    &.show{
         opacity: 1;
-    }    
+    }
     &.hide{
         transition: all 0.5s linear;
         opacity: 0;
     }
-    
+
 }
 
 #scores{
@@ -150,12 +150,12 @@ $img-user : 80px;
     flex-direction: column;
     align-self: center;
     width:900px;
-    
-    
+
+
     transition: all 2s linear;
-    &.show{        
+    &.show{
         opacity: 1;
-    }    
+    }
     &.hide{
         transition: all 0.5s linear;
         opacity: 0;
@@ -193,7 +193,7 @@ $img-user : 80px;
         color: #C2185B;
     }
 
-    h4, h5{ 
+    h4, h5{
         color : #F8BBD0;
     }
 
@@ -255,11 +255,11 @@ $img-user : 80px;
         }
     }
 
-    #scores{ 
+    #scores{
         h1.title{
             font-size: 2em;
         }
     }
 }
 
-//  @import "correct.scss";
+  @import "correct.scss";
